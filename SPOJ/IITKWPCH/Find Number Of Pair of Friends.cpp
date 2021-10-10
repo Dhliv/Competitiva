@@ -22,10 +22,36 @@ int main(){
   cin.tie(NULL); 
   cout.tie(NULL);
 
-  int a[5] = {1, 2, 3, 4, 5};
+  int t, n, num;
+  ll x, res;
+  const int pot = 10;
+  cin >> t;
+  
+  FOR(ab, 0, t){
+    cin >> n;
+    vector<ll> vcs(1 << 10);
 
-  FOR(i, 0, 5){
-    cout << *(a + i) << " ";
+    FOR(i, 0, n){
+      cin >> x;
+      num = 0;
+
+      while(x != 0){
+        num |= 1 << (x%pot);
+        x /= 10;
+      }
+
+      vcs[num]++;
+    }
+
+    res = 0;
+    FOR(i, 0, 1 << 10){
+      if(vcs[i]) res += vcs[i]*(vcs[i] - 1)/2;
+      FOR(j, i + 1, 1 << 10){
+        if(i & j) res += vcs[i]*vcs[j];
+      }
+    }
+
+    cout << res << "\n";
   }
 
   return 0;
