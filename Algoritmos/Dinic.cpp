@@ -37,6 +37,7 @@ int dfs(int ori, int &dest, int minimo, vector<vector<int> > &grafo, vector<vect
       flows[y][ori] += flow;
       if(flows[ori][y] == 0) grafo[ori].erase(grafo[ori].begin() + i);
       if(flows[y][ori] == flow) grafo[y].PB(ori);
+      return flow;
     }else if(c == s[y]){
       flow = dfs(y, dest, min(flows[ori][y], minimo), grafo, flows);
       
