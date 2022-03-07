@@ -21,5 +21,29 @@ int main(){
   cin.tie(NULL);
   cout.tie(NULL);
 
+  int t, n, pb, ib, x; cin >> t;
+  bool able;
+
+  FOR(ab, 0, t){
+  	cin >> n;
+  	pb = ib = -1;
+  	able = true;
+
+  	FOR(i, 0, n){
+  		cin >> x;
+
+  		if(x & 1){
+  			if(ib  > x) able = false;
+  			ib = x;
+  		}else{
+  			if(pb > x) able = false;
+  			pb = x;
+  		}
+  	}
+
+  	if(able) cout << "yes\n";
+  	else cout << "no\n";
+  }
+
   return 0;
 }
