@@ -1,50 +1,72 @@
-vector<int> s;
+struct edge{
+  int x, y, flow;
+};
 
-int bfs(int &ori, int &dest, vector<vector<int> > &grafo, vector<vector<int> > &flows){
-  int x, n = grafo.size();
-  FOR(i, 0, n) s[i] = INF;
-  
-  deque<int> q;
-  q.PB(ori);
-  s[ori] = 0;
-  
+int ans;
+vector<edge> edges;
+vector<vector<int> > grafo;
+vector<int> sn;
+
+void addEdge(int x, int y, int flow){
+  grafo[x].PB(edges.size());
+  edges.PB({x, y, flow});
+
+  grafo[y].PB(edges.size());
+  edges.PB({y, x, 0});
+}
+
+int bfs(int &ori, int &target){
+  int x = ori, y, flow;
+
+  FOR(i, 0, target + 1) sn[i] = INF;
+
+  sn[x] = 0;
+  deque<int> q(1, x);
+
   while(!q.empty()){
-    x = q.F();
-    q.P_F();
-    
-    for(auto y: grafo[x]){
-      if(s[y] != INF or flows[x][y] == 0) continue; // Edge already seen or Edge doesn't exists.
-      
-      s[y] = s[x] + 1;
+    x = q.F(); q.P_F();
+
+    for(auto &e: grafo[x]){
+      auto &edge = edges[e];
+      y = edge.y;
+      flow = edge.flow;
+
+      if(flow <= 0) continue;
+      if(sn[y] != INF) continue;
+      sn[y] = sn[x] + 1;
       q.PB(y);
     }
   }
-  
-  return s[dest];
+
+  return sn[target];
 }
 
-int dfs(int ori, int &dest, int minimo, vector<vector<int> > &grafo, vector<vector<int> > &flows){
-  int flow = INF, c = s[ori] + 1;
-  
-  for(auto y: grafo[ori]){
-    if(flows[ori][y] != 0){ // Edge exists.
-      if(y == dest){
-        flow = min(flows[ori][dest], minimo);
-        
-        flows[ori][y] -= flow;
-        flows[y][ori] += flow;
-        return flow;
-      }else if(c == s[y]){
-        flow = dfs(y, dest, min(flows[ori][y], minimo), grafo, flows);
-        
-        if(flow != INF){
-          flows[ori][y] -= flow;
-          flows[y][ori] += flow;
-          return flow;
-        }
-      }
+int dfs(int ori, int &target, int min_flow){
+  int flow = INF, y;
+
+  for(auto &e_id: grafo[ori]){
+    auto &e = edges[e_id];
+    y = e.y;
+
+    if(sn[y] != 1 + sn[ori]) continue;
+    if(e.flow <= 0) continue;
+
+    if(y == target){
+      flow = min(min_flow, e.flow);
+      ans += flow;
+      edges[e_id].flow -= flow;
+      edges[e_id^1].flow += flow;
+      return flow;
+    }
+
+    flow = dfs(y, target, min(min_flow, e.flow));
+
+    if(flow != INF){
+      edges[e_id].flow -= flow;
+      edges[e_id^1].flow += flow;
+      return flow;
     }
   }
-  
+
   return flow;
 }
