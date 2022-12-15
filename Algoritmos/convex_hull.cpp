@@ -1,9 +1,9 @@
 struct pt {
-  double x, y;
+  ld x, y;
 };
 
 int orientation(pt a, pt b, pt c) {
-  double v = a.x*(b.y-c.y)+b.x*(c.y-a.y)+c.x*(a.y-b.y);
+  ld v = a.x*(b.y-c.y)+b.x*(c.y-a.y)+c.x*(a.y-b.y);
   if (v < 0) return -1; // clockwise
   if (v > 0) return +1; // counter-clockwise
   return 0;
