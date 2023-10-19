@@ -17,23 +17,23 @@
 #define MAX 502
  
 using namespace std;
-
+ 
 int ans;
 vector<vector<int> > g(MAX), fls(MAX, vector<int> (MAX)), gans(MAX), flans(MAX, vector<int> (MAX));
 vector<int> s(MAX);
 deque<int> res;
-
+ 
 bool bfs(int &ori, int &t, int &id){
   FOR(i, 0, s.size()) s[i] = INF;
   deque<int> q;
   q.PB(ori);
   int x;
   s[ori] = 0;
-
+ 
   while(!q.empty()){
     x = q.F();
     q.P_F();
-
+ 
     for(auto y: (id == 0 ? g[x] : gans[x])){
       if(s[y] == INF and (id == 0 ? fls[x][y] : flans[x][y])){
         s[y] = s[x] + 1;
@@ -41,25 +41,26 @@ bool bfs(int &ori, int &t, int &id){
       }
     }
   }
-
+ 
   return s[t] != INF;
 }
-
-int dfs(int x, int &t){
-  int fl = INF;
-
-  for(auto y: g[x]){
+ 
+int dfs(int x, int &t, vector<int> &dp){
+  int fl = INF, y;
+ 
+  for(int &i = dp[x]; i < g[x].size(); ++i){
+    y = g[x][i];
     if(y == t and fls[x][y]){
       fls[x][y]--;
       fls[y][x]++;
-
+ 
       flans[x][y]++;
       if(flans[y][x]) flans[y][x]--;
       ans++;
       return 1;
     }else if(s[x] + 1 == s[y] and fls[x][y]){
-      fl = dfs(y, t);
-
+      fl = dfs(y, t, dp);
+ 
       if(fl != INF){
         fls[x][y]--;
         fls[y][x]++;
@@ -69,21 +70,22 @@ int dfs(int x, int &t){
       }
     }
   }
-
+ 
   return fl;
 }
-
-int imp(int x, int &sr){
-  int fl = INF;
-  for(int y: gans[x]){
+ 
+int imp(int x, int &sr, vector<int> &dp){
+  int fl = INF, y;
+  for(int &i = dp[x]; i < gans[x].size(); ++i){
+    y = gans[x][i];
     if(y == sr and flans[x][y]){
       flans[x][y]--;
       res.PB(x);
       return 1;
     }
     if(s[x] + 1 == s[y] and flans[x][y]){
-      fl = imp(y, sr);
-
+      fl = imp(y, sr, dp);
+ 
       if(fl != INF){
         flans[x][y]--;
         res.PF(x);
@@ -91,7 +93,7 @@ int imp(int x, int &sr){
       }
     }
   }
-
+ 
   return INF;
 }
  
@@ -99,13 +101,13 @@ int main(){
   ios_base::sync_with_stdio(false);
   cin.tie(NULL);
   cout.tie(NULL);
-
+ 
   int n, m, sr, t, x, y, z = 0, u = 1;
   cin >> n >> m;
-
+ 
   sr = 0;
   t = n + 1;
-
+ 
   FOR(i, 0, m){
     cin >> x >> y;
     if(!fls[x][y]){
@@ -118,7 +120,7 @@ int main(){
     }
     fls[x][y] = 1;
   }
-
+ 
   fls[sr][1] = fls[n][t] = m + 1;
   flans[sr][1] = flans[n][t] = m + 1;
   g[sr].PB(1);
@@ -129,16 +131,18 @@ int main(){
   gans[n].PB(t);
   gans[1].PB(sr);
   gans[t].PB(n);
-
+ 
   ans = 0;
   while(bfs(sr, t, z)){
-    while(dfs(sr, t) != INF){}
+    vector<int> dp(MAX);
+    while(dfs(sr, t, dp) != INF){}
   }
-
+ 
   cout << ans << "\n";
   while(bfs(sr, t, u)){
-    imp(sr, t);
-
+    vector<int> dp(MAX);
+    imp(sr, t, dp);
+ 
     res.P_F();
     cout << res.size() << "\n";
     while(!res.empty()){
