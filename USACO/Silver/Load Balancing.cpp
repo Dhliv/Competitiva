@@ -42,7 +42,7 @@ int main(){
   cin.open("balancing.in");
   ofstream cout("balancing.out");
 
-  int n, b; cin >> n >> b;
+  int n; cin >> n;
   int mini = INF;
   vector<pair<int, int> > p(n);
 
@@ -50,11 +50,7 @@ int main(){
 
   FOR(i, 0, n){
     FOR(j, 0, n){
-      mini = min(mini, f(p[i].f + 1, p[j].s + 1, p));
-      mini = min(mini, f(p[i].f + 1, p[j].s - 1, p));
-      mini = min(mini, f(p[i].f - 1, p[j].s + 1, p));
       mini = min(mini, f(p[i].f - 1, p[j].s - 1, p));
-
     }
   }
 
